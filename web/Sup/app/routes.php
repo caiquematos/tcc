@@ -15,3 +15,7 @@ Route::get('/', function()
 {
 	return View::make('hello');
 });
+
+Route::controller('/user', 'UserController');
+Route::controller('/coordinator', 'CoordinatorController');
+Route::controller('/module', 'ModuleController');

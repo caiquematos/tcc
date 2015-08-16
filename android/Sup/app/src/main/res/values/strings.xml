@@ -1,6 +1,38 @@
 <resources>
-    <string name="app_name">Sup</string>
+    <string name="app_name">Supervisório Xbee</string>
+
+    <string name="splash_title">XBee!</string>
+
+    <string name="action_settings">Settings</string>
+    <string name="title_activity_login">Supervisório Xbee</string>
+
+    <string name="name">nome</string>
+    <string name="email">email</string>
+    <string name="password">senha</string>
+    <string name="login_button">entrar</string>
+    <string name="register_button">registrar</string>
+    <string name="title_activity_home">Coordenadores</string>
+
+    <string name="home_logout">sair</string>
+    <string name="home_coordinator">Coordenadores</string>
+    <string name="main_title_coordinator">Título Principal</string>
+    <string name="body_title_coordinator">resumo sobre o coordenador</string>
+
+    <string name="home_module">Módulos</string>
+    <string name="main_title_module">Título Principal</string>
+    <string name="body_title_module">resumo sobre o módulo</string>
+
+    <string name="packFrequency">Frequência de Pacotes</string>
+    <string name="sleepFrequency">Sleep Frequency</string>
+    <string name="sleepTime">Sleep Time</string>
+    <string name="numb_of_samples">Número de Amostras</string>
+    <string name="numb_of_modules">Número de Módulos</string>
+    <string name="samples">Amostras</string>
 
     <string name="hello_world">Hello world!</string>
-    <string name="action_settings">Settings</string>
+    <string name="title_activity_register">Supervisório Xbee</string>
+    <string name="title_activity_module">Módulos</string>
+    <string name="title_activity_module_dialog">Detalhes</string>
+    <string name="title_activity_coordinator_dialog">Detalhes</string>
+    <string name="title_activity_sample">Amostras</string>
 </resources>

@@ -1,0 +1,9 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:context="com.example.caique.sup.Activities.HomeActivity">
+
+    <item android:id="@+id/home_logout" android:title="@string/home_logout"
+        android:orderInCategory="100" app:showAsAction="never" />
+
+</menu>
