@@ -2,23 +2,31 @@
 
 class UserController extends \BaseController {
 
-    private $history;
-
-    public function UserController(){
-        $this->history = new HistoryController;
-    }
-	
-	public function getIndex()
-	{
-        return Response::make('You can go and try /login or /register or /edit or /buddies');
-	}
+  private $history;
+  private $idUser;
+  
+  public function UserController(){
+    $this->history = new HistoryController;
+    $id = Session::get("user");
     
+    if ($id == null || $id == "") {
+      $this->idUser = false;
+    }
+    else {
+      $this->idUser = Crypt::decrypt($id);
+    }
+  }
+
+    public function getIndex()
+    {
+          return Response::make('You can go and try /login or /register or /edit or /buddies');
+    }
+
     public function anyLogin(){
         $json = json_decode(Input::get("json"));
         $user = User::whereEmail($json->email)->first();
 
         if( $user && Hash::check( $json->password, $user->password ) ) {
-            $user->save();
             $result = ["status"=>"success", "wasRegistered"=>"true", "user"=>$user];
             //$this->history->save( $user->id, "you lodded in on the system" );
         } else {
@@ -26,6 +34,21 @@ class UserController extends \BaseController {
         }
         
         return Response::json($result);
+    }
+  
+    public function anyWebLogin(){
+      $user = User::whereEmail(Input::get("email"))->first();
+      if( $user ) {
+        if ( Hash::check( Input::get("password"), $user->password ) ) {
+          Session::put("user", Crypt::encrypt($user->id));
+          $coordinators = Coordinator::all();
+          return Redirect::to("/")->with('coordenadores',["coordinators"=>$coordinators]);
+        } else {
+          return Redirect::to("/")->with('msg','Password does not match!');
+        }
+      } else {
+        return Redirect::to("/")->with('msg','User not registered!');
+      }
     }
     
     public function anyRegister() {
