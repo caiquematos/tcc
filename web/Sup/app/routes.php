@@ -17,7 +17,10 @@ Route::get('/', function()
 });
 
 Route::get('/coordenadores', function() {
-    return view::make('coordenadores');
+    return View::make('coordenadores');
+});
+Route::get('/modulos', function() {
+    return View::make('modulos');
 });
 
 Route::controller('/user', 'UserController');

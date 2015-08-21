@@ -20,11 +20,11 @@
   <nav class=" #b2dfdb teal lighten-4" role="navigation">
     <div class="nav-wrapper container"><a id="logo-container" href="#" class="brand-logo">Supervisório Xbee</a>
       <ul class="right hide-on-med-and-down">
-        <li class="menu"><a href={{URL::to('coordenadores')}}>Coordenadores</a></li>
+        <li class="menu"><a href={{URL::to('perfil')}}>Perfil</a></li>
       </ul>
 
       <ul id="nav-mobile" class="side-nav">
-        <li><a href="#"></a></li>
+        <li class="menu"><a href={{URL::to('perfil')}}>Perfil</a></li>
       </ul>
       <a href="#" data-activates="nav-mobile" class="button-collapse"><i class="zmdi zmdi-menu"></i></a>
     </div>
@@ -48,7 +48,10 @@
           <label for="password">Senha</label>
       </div>
 
-        <button class="btn waves-effect waves-light #ff9e80 deep-orange accent-1" type="submit" name="action">Entrar</button></br></br>
+        <!--<button class="btn waves-effect waves-light #ff9e80 deep-orange accent-1" type="submit" name="action" >Entrar</button></br></br>-->
+        <div class="menu">
+         <a class="btn waves-effect waves-light #ff9e80 deep-orange accent-1" href={{URL::to('coordenadores')}}>Entrar</a></br></br>
+        </div>
         <a class="waves-effect waves-light btn modal-trigger" href="#modal1">Cadastrar</a>
         </div>
       </form>

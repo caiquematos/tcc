@@ -6,8 +6,8 @@
               <span class="card-title"></span>
             </div>
             <div class="card-content center">
-                <h5>Coordenador 01</h5>
-                Número de Módulos: 02
+                <h5>Módulo 01</h5>
+                Número de Amostras: 02
                 <br/><i class="zmdi zmdi-battery"></i> 33%
             </div>
             <div class="card-action row center">
@@ -19,9 +19,41 @@
                 <i style="cursor:pointer" class="zmdi zmdi-menu zmdi-hc-2x right activator"></i></div>
             </div>
                 <div class="card-reveal">
-      <span class="card-title grey-text text-darken-4">Card Title<i class="zmdi zmdi-close right"></i></span>
-      <p>Here is some more information about this product that is only revealed once clicked on.</p>
-    </div>
+      <span class="card-title grey-text text-darken-4">Detalhes<i class="zmdi zmdi-close right"></i></span><br/>
+        Coordenador<br/> 01             
+      <hr>
+        Frequência de pacotes<input type="number" value="17.0">              
+      
+        Sleep Time<input type="time" value="17:56:00">           
+      
+        Sleep Frequency<input type="number" value="2">             
+      
+        Número de Amostras<br/><input type="number" value="4">
+                    
+        <div class="center" ><a class="btn waves-effect waves-light green">Alterar</a></div>
+                    
+        </div>
           </div>
         </div>          
 </div>
+
+  <!-- Modal Structure -->
+  <div id="modalAmostras1" class="modal">
+      <h5 class="center">Módulo 01</h5>
+    <div class="modal-content">
+      <ul class="collection">
+      <li class="collection-item">0) <b style="font-size:20px">33.33</b> em 2015-08-11 21:25:98.0</li>
+      <li class="collection-item">1) <b style="font-size:20px">33.33</b>  em 2015-08-11 21:25:98.0</li>
+      <li class="collection-item">2) <b style="font-size:20px">33.33</b>  em 2015-08-11 21:25:98.0</li>
+      <li class="collection-item">3) <b style="font-size:20px">33.33</b>  em 2015-08-11 21:25:98.0</li>
+        </ul>
+    </div>
+   
+  </div>
+
+<script>
+ $(document).ready(function(){
+    $('.modal-trigger').leanModal();
+
+  });
+</script>
