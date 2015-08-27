@@ -1,9 +1,10 @@
 package com.example.caique.sup.Activities;
 
+import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.widget.SwipeRefreshLayout;
-import android.support.v7.app.ActionBarActivity;
+import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -14,8 +15,17 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.caique.sup.Module.CustomAdapter;
+import com.example.caique.sup.Objects.Module;
 import com.example.caique.sup.R;
+import com.example.caique.sup.Tools.Constants;
+import com.example.caique.sup.Tools.HandleConnection;
+import com.example.caique.sup.Tools.Methods;
+import com.example.caique.sup.Tools.Preferences;
+import com.example.caique.sup.Tools.Request;
 
+import org.apache.http.NameValuePair;
+import org.apache.http.message.BasicNameValuePair;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -25,15 +35,7 @@ import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
 
-import Module.CustomAdapter;
-import Objects.Module;
-import Tools.Constants;
-import Tools.HandleConnection;
-import Tools.Methods;
-import Tools.Preferences;
-import Tools.Request;
-
-public class ModuleActivity extends ActionBarActivity implements HandleConnection {
+public class ModuleActivity extends AppCompatActivity implements HandleConnection {
     ProgressBar mModulePB;
     RecyclerView mModuleList;
     AsyncTask<String, Void, Request> mRetrieveModules;
@@ -96,7 +98,7 @@ public class ModuleActivity extends ActionBarActivity implements HandleConnectio
             Log.e(getClass().getName(), "intent not null");
         } else {
             mCoordinator = Preferences.getCurrentCoordinatorId(getApplicationContext());
-            mTitle.setText("Coordenador " + mCoordinator );
+            mTitle.setText("Coordenador " + mCoordinator);
             retrieveModules(String.valueOf(mCoordinator));
             Log.e(getClass().getName(), "intent null");
         }
@@ -104,8 +106,8 @@ public class ModuleActivity extends ActionBarActivity implements HandleConnectio
 
     private void retrieveModules(String coordinator) {
         mRetrieveModules = new AsyncTask<String, Void, Request>() {
-            JSONObject rawJson = new JSONObject();
             Request request = new Request();
+            List<NameValuePair> nameValuePairs = new ArrayList<>();
 
             @Override
             protected void onPreExecute() {
@@ -114,16 +116,10 @@ public class ModuleActivity extends ActionBarActivity implements HandleConnectio
             }
 
             @Override
-            protected Request doInBackground(String... params) {
-                try {
-                    rawJson.put("coordinator",Integer.valueOf(params[0]));
-                    request.setResponse(Methods.POST(getApplicationContext(), rawJson, "module/list"));
-                    return request;
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                    Toast.makeText(getApplicationContext(), "Falha na conexão", Toast.LENGTH_SHORT).show();
-                }
-                return null;
+            protected Request doInBackground(String... strings) {
+                if(!strings[0].isEmpty()) { nameValuePairs.add(new BasicNameValuePair("coordinator", strings[0])); }
+                request.setResponse(Methods.Post2(getApplicationContext(), nameValuePairs, "module/list"));
+                return request;
             }
 
             @Override
@@ -159,11 +155,37 @@ public class ModuleActivity extends ActionBarActivity implements HandleConnectio
         int id = item.getItemId();
 
         //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
+        if (id == R.id.module_log) {
+            goToLog();
+            return true;
+        }
+        if (id == R.id.module_logout) {
+            Preferences.saveAccountStatus(getApplicationContext(),false);
+            goToLogin();
+            return true;
+        }
+        if (id == R.id.module_profile) {
+            goToEditProfile();
             return true;
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    private void goToLog() {
+        Intent activity = new Intent(this, LogActivity.class);
+        startActivity(activity);
+    }
+
+    private void goToLogin() {
+        Intent activity = new Intent(this, LoginActivity.class);
+        startActivity(activity);
+        finish();
+    }
+
+    private void goToEditProfile() {
+        Intent activity = new Intent(this, ProfileActivity.class);
+        startActivity(activity);
     }
 
     @Override

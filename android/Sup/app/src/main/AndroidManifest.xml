@@ -4,6 +4,14 @@
 
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.WAKE_LOCK" />
+    <uses-permission android:name="com.google.android.c2dm.permission.RECEIVE" />
+
+    <permission
+        android:name="com.example.caique.sup.permission.C2D_MESSAGE"
+        android:protectionLevel="signature" />
+
+    <uses-permission android:name="com.google.android.c2dm.permission.SEND" />
 
     <application
         android:allowBackup="true"
@@ -12,7 +20,8 @@
         android:theme="@style/AppTheme" >
         <activity
             android:name=".Activities.MainActivity"
-            android:label="@string/app_name" >
+            android:label="@string/app_name"
+            android:theme="@style/Theme.AppCompat.NoActionBar" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -24,7 +33,7 @@
             android:label="@string/title_activity_login" >
         </activity>
         <activity
-            android:name=".Activities.HomeActivity"
+            android:name=".Activities.CoordinatorActivity"
             android:label="@string/title_activity_home" >
         </activity>
         <activity
@@ -38,10 +47,10 @@
         <activity
             android:name=".Activities.ModuleActivity"
             android:label="@string/title_activity_module"
-            android:parentActivityName=".Activities.HomeActivity" >
+            android:parentActivityName=".Activities.CoordinatorActivity" >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value="Activities.HomeActivity" />
+                android:value=".Activities.CoordinatorActivity" />
         </activity>
         <activity
             android:name=".Activities.ModuleDialog"
@@ -51,16 +60,62 @@
         <activity
             android:name=".Activities.CoordinatorDialog"
             android:label="@string/title_activity_coordinator_dialog"
-            android:parentActivityName=".Activities.HomeActivity"
+            android:parentActivityName=".Activities.CoordinatorActivity"
             android:theme="@style/Theme.AppCompat.DialogWhenLarge" >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value="com.example.caique.sup.Activities.HomeActivity" />
+                android:value=".Activities.CoordinatorActivity" />
         </activity>
         <activity
             android:name=".Activities.SampleActivity"
             android:label="@string/title_activity_sample"
-            android:theme="@style/Base.Theme.AppCompat.Dialog.FixedSize">
+            android:theme="@style/Base.Theme.AppCompat.Dialog.FixedSize" >
+        </activity>
+        <!-- [START gcm_receiver] -->
+        <receiver
+            android:name="com.google.android.gms.gcm.GcmReceiver"
+            android:exported="true"
+            android:permission="com.google.android.c2dm.permission.SEND" >
+            <intent-filter>
+                <action android:name="com.google.android.c2dm.intent.RECEIVE" />
+
+                <category android:name="com.example.caique.sup" />
+            </intent-filter>
+        </receiver>
+        <!-- [END gcm_receiver] -->
+
+
+        <!-- [START gcm_listener] -->
+        <service
+            android:name=".GCM.MyGcmListenerService"
+            android:exported="false" >
+            <intent-filter>
+                <action android:name="com.google.android.c2dm.intent.RECEIVE" />
+            </intent-filter>
+        </service>
+        <!-- [END gcm_listener] -->
+        <!-- [START instanceId_listener] -->
+        <service
+            android:name=".GCM.MyInstanceIDListenerService"
+            android:exported="false" >
+            <intent-filter>
+                <action android:name="com.google.android.gms.iid.InstanceID" />
+            </intent-filter>
+        </service>
+        <!-- [END instanceId_listener] -->
+        <service
+            android:name=".GCM.RegistrationIntentService"
+            android:exported="false" >
+        </service>
+
+        <activity
+            android:name=".Activities.LogActivity"
+            android:label="@string/title_activity_log" >
+        </activity>
+        <activity
+            android:name=".Activities.ProfileActivity"
+            android:label="@string/title_activity_profile"
+            android:theme="@style/Base.Theme.AppCompat.Dialog.FixedSize" >
         </activity>
     </application>
 

@@ -1,7 +1,13 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    tools:context="com.example.caique.sup.Activities.HomeActivity">
+    tools:context="com.example.caique.sup.Activities.CoordinatorActivity">
+
+    <item android:id="@+id/home_log" android:title="@string/title_activity_log"
+        android:orderInCategory="98" app:showAsAction="never" />
+
+    <item android:id="@+id/home_profile" android:title="@string/title_activity_profile"
+        android:orderInCategory="99" app:showAsAction="never" />
 
     <item android:id="@+id/home_logout" android:title="@string/home_logout"
         android:orderInCategory="100" app:showAsAction="never" />

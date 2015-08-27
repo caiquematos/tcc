@@ -12,6 +12,11 @@ class HistoryController extends \BaseController {
 	{
 		return Response::make('stop sooping around!');
 	}
+  
+  public function anyList(){
+    $histories = History::orderBy("created_at", "DESC")->take(30)->get();
+    return Response::json(["histories"=>$histories]);
+  }
     
     public function save($user, $information){
         $history = new History;

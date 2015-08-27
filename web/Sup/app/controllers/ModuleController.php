@@ -1,14 +1,25 @@
 <?php
 
 class ModuleController extends \BaseController {
+  
+  const BATTERY_FULL = 5.0;
+  private $history;
+  
+  public function ModuleController(){
+    $this->history = new HistoryController;
+  }
 
 	public function getIndex(){
-    return Response::make('You can go and try /list');
+    $modules = Module::whereCoordinator(Input::get("coordinator"))->get();
+    foreach ($modules as $module) {
+      $module->numb_of_samples = Sample::whereModule($module->id)->count();
+        $module->battery = ($module->battery * 100)/self::BATTERY_FULL;
+    }
+    return View::make('modulos',['modules'=>$modules]);
 	}
   
   public function anyList(){
-    $json = json_decode(Input::get('json'));
-    $modules = Module::whereCoordinator($json->coordinator)->get();
+    $modules = Module::whereCoordinator(Input::get("coordinator"))->get();
     foreach ($modules as $module) {
       $module->numb_of_samples = Sample::whereModule($module->id)->count();
     }
@@ -17,18 +28,17 @@ class ModuleController extends \BaseController {
   
   //retreivign 30 samples
   public function anySample(){
-    $json = json_decode(Input::get('json'));
-    $samples = Sample::whereModule($json->module)->orderBy("created_at", "DESC")->take(30)->get();
+    $samples = Sample::whereModule(Input::get("module"))->orderBy("created_at", "DESC")->take(30)->get();
     return Response::json(["samples"=>$samples]);
   }
   
   public function anyPackFrequency(){
-    $json = json_decode(Input::get("json"));
-    $module = Module::find($json->module);
+    $module = Module::find(Input::get("module"));
     
     if ( $module ) {
-      $module->packFrequency = $json->packFrequency;
+      $module->packFrequency = Input::get("packFrequency");
       $module->save();
+      $this->history->save(Input::get("user"), "mudou a frequência de pacotes do módulo ".$module->id." para ".$module->packFrequency);
       $result = "success";
     } else {
       $result = "fail";
@@ -38,12 +48,12 @@ class ModuleController extends \BaseController {
   }
   
   public function anySleepTime(){
-     $json = json_decode(Input::get("json"));
-    $module = Module::find($json->module);
+    $module = Module::find(Input::get("module"));
     
     if ( $module ) {
-      $module->sleepTime = $json->sleepTime;
+      $module->sleepTime = Input::get("sleepTime");
       $module->save();
+      $this->history->save(Input::get("user"), "mudou o sleep time do módulo ".$module->id." para ".$module->sleepTime);
       $result = "success";
     } else {
       $result = "fail";
@@ -53,12 +63,12 @@ class ModuleController extends \BaseController {
   }
   
   public function anySleepFrequency(){
-     $json = json_decode(Input::get("json"));
-    $module = Module::find($json->module);
+    $module = Module::find(Input::get("module"));
     
     if ( $module ) {
-      $module->sleepFrequency = $json->sleepFrequency;
+      $module->sleepFrequency = Input::get("sleepFrequency");
       $module->save();
+      $this->history->save(Input::get("user"), "mudou a frequência de standby do módulo ".$module->id." para ".$module->sleepFrequency);
       $result = "success";
     } else {
       $result = "fail";
@@ -69,12 +79,17 @@ class ModuleController extends \BaseController {
   
   //Set the module status, by the APP and the DEVICE
    public function anyStatus() {
-    $json = json_decode(Input::get("json"));
-    $module = Module::find($json->module);
+    $module = Module::find(Input::get("module"));
     
     if ( $module ) {
-      $module->status = $json->status;
+      $module->status = Input::get("status");
       $module->save();
+       $gcm = new GCMController;
+      if(Input::get("status") == 1) $status = "ATIVADO";
+      else $status = "DESATIVADO";
+      $gcm->broadcast("O nó módulo ".$module->id." foi ".$status."!");
+      $user = empty(Input::get("user")) ? Session::get("user") : Input::get("user");
+      $this->history->save($user, $status." o módulo ".$module->id);
       $result = "success";
     } else {
       $result = "fail";
@@ -87,13 +102,16 @@ class ModuleController extends \BaseController {
   //methods intended to be used by the DEVICE
   
    public function anyAddBattery(){
-    $json = json_decode(Input::get("json"));
-    $module = Module::find($json->module);
+    $module = Module::find(Input::get("module"));
     
     if ( $module ) {
-      $module->battery = $json->battery;
+      $module->battery = Input::get("battery");
       $module->save();
-      if ($module->battery == 2 || $module->battery == 1) // TODO: send push notification
+       if ($module->battery == 1 || $module->battery == 2 || $module->battery == 0.5) {
+        $porcentage = ($module->battery * 100)/self::BATTERY_FULL;
+        $gcm = new GCMController;
+        $gcm->broadcast("Bateria módulo ".$module->id." abaixo de ".$porcentage."%");
+      }// TODO: send push notification
       $result = "success";
     } else {
       $result = "fail";
@@ -103,13 +121,12 @@ class ModuleController extends \BaseController {
   }
   
   public function anyAddSample(){
-    $json = json_decode(Input::get("json"));
-    $module = Module::find($json->module);
+    $module = Module::find(Input::get("module"));
     
     if ( $module ) {
       $sample = new Sample;
       $sample->module = $module->id;
-      $sample->value = $json->value;
+      $sample->value = Input::get("value");
       $sample->save();
       $result = "success";
       return Response::json(["result" => $result, "sample"=>$sample->id]);

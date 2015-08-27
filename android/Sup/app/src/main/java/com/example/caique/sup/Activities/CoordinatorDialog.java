@@ -15,14 +15,19 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.caique.sup.R;
+import com.example.caique.sup.Tools.Constants;
+import com.example.caique.sup.Tools.HandleConnection;
+import com.example.caique.sup.Tools.Methods;
+import com.example.caique.sup.Tools.Preferences;
+import com.example.caique.sup.Tools.Request;
 
+import org.apache.http.NameValuePair;
+import org.apache.http.message.BasicNameValuePair;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import Tools.Constants;
-import Tools.HandleConnection;
-import Tools.Methods;
-import Tools.Request;
+import java.util.ArrayList;
+import java.util.List;
 
 public class CoordinatorDialog extends ActionBarActivity implements HandleConnection {
     TextView mBattery;
@@ -31,6 +36,7 @@ public class CoordinatorDialog extends ActionBarActivity implements HandleConnec
     CheckBox mCheckbox;
     TextView mCoordinatorTitle;
     char mStatus;
+    int mUser;
 
     @TargetApi(Build.VERSION_CODES.ICE_CREAM_SANDWICH)
     @Override
@@ -45,6 +51,7 @@ public class CoordinatorDialog extends ActionBarActivity implements HandleConnec
         mCheckbox = (CheckBox) findViewById(R.id.coo_dial_checkbox);
         mNumbOfMod = (TextView) findViewById(R.id.coo_dial_modules);
         mCoordinatorTitle = (TextView) findViewById(R.id.coo_dial_title);
+        mUser = Preferences.getUserId(this);
 
         mCoordinatorTitle.setText("Cordenador " + getIntent().getExtras().getInt("id"));
         mBattery.setText("" + getIntent().getExtras().getFloat("battery"));
@@ -66,8 +73,8 @@ public class CoordinatorDialog extends ActionBarActivity implements HandleConnec
                 @Override
                 public void onClick(View v) {
                     if(Methods.isNetworkAvailable(getApplicationContext()))
-                        if (mStatus == '1') switchCoordinator(getIntent().getExtras().getInt("id"), 0);
-                        else switchCoordinator(getIntent().getExtras().getInt("id"), 1);
+                        if (mStatus == '1') switchCoordinator(getIntent().getExtras().getInt("id"), 0, mUser);
+                        else switchCoordinator(getIntent().getExtras().getInt("id"), 1, mUser);
                     else {
                         Toast.makeText(getApplicationContext(), Constants.INTERNET_ERROR, Toast.LENGTH_SHORT).show();
                         if (mSwitch.isChecked()) mSwitch.setChecked(false);
@@ -81,8 +88,8 @@ public class CoordinatorDialog extends ActionBarActivity implements HandleConnec
                 @Override
                 public void onClick(View v) {
                     if(Methods.isNetworkAvailable(getApplicationContext()))
-                        if (mStatus == '1') switchCoordinator(getIntent().getExtras().getInt("id"), 0);
-                        else switchCoordinator(getIntent().getExtras().getInt("id"), 1);
+                        if (mStatus == '1') switchCoordinator(getIntent().getExtras().getInt("id"), 0, mUser);
+                        else switchCoordinator(getIntent().getExtras().getInt("id"), 1, mUser);
                     else {
                         Toast.makeText(getApplicationContext(), Constants.INTERNET_ERROR, Toast.LENGTH_SHORT).show();
                         if (mCheckbox.isChecked()) mCheckbox.setChecked(false);
@@ -92,10 +99,10 @@ public class CoordinatorDialog extends ActionBarActivity implements HandleConnec
             });
     }
 
-    private void switchCoordinator(int coordinator, int status) {
+    private void switchCoordinator(int coordinator, int status, int user) {
         AsyncTask<String, Void, Request> switchRequest = new AsyncTask<String, Void, Request>() {
-            JSONObject rawJson = new JSONObject();
             Request request = new Request();
+            List<NameValuePair> nameValuePairs = new ArrayList<>();
 
             @Override
             protected void onPreExecute() {
@@ -105,17 +112,12 @@ public class CoordinatorDialog extends ActionBarActivity implements HandleConnec
             }
 
             @Override
-            protected Request doInBackground(String... params) {
-                try {
-                    rawJson.put("coordinator",params[0]);
-                    rawJson.put("status", params[1]);
-                    request.setResponse(Methods.POST(getApplicationContext(), rawJson, "coordinator/switch"));
-                    return request;
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                    Toast.makeText(getApplicationContext(), "Falha na conexão", Toast.LENGTH_SHORT).show();
-                }
-                return null;
+            protected Request doInBackground(String... strings) {
+                if(!strings[0].isEmpty()) { nameValuePairs.add(new BasicNameValuePair("coordinator", strings[0])); }
+                if(!strings[1].isEmpty()) { nameValuePairs.add(new BasicNameValuePair("status", strings[1])); }
+                if(!strings[2].isEmpty()) { nameValuePairs.add(new BasicNameValuePair("user", strings[2])); }
+                request.setResponse(Methods.Post2(getApplicationContext(), nameValuePairs, "coordinator/switch"));
+                return request;
             }
 
             @Override
@@ -131,7 +133,7 @@ public class CoordinatorDialog extends ActionBarActivity implements HandleConnec
             }
         };
 
-        switchRequest.execute(String.valueOf(coordinator), String.valueOf(status));
+        switchRequest.execute(String.valueOf(coordinator), String.valueOf(status), String.valueOf(user));
     }
 
     @TargetApi(Build.VERSION_CODES.ICE_CREAM_SANDWICH)

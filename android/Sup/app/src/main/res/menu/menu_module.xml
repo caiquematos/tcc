@@ -2,6 +2,13 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     tools:context="com.example.caique.sup.Activities.ModuleActivity">
-    <item android:id="@+id/action_settings" android:title="@string/action_settings"
+
+    <item android:id="@+id/module_log" android:title="@string/title_activity_log"
+        android:orderInCategory="98" app:showAsAction="never" />
+
+    <item android:id="@+id/module_profile" android:title="@string/title_activity_profile"
+        android:orderInCategory="99" app:showAsAction="never" />
+
+    <item android:id="@+id/module_logout" android:title="@string/home_logout"
         android:orderInCategory="100" app:showAsAction="never" />
 </menu>

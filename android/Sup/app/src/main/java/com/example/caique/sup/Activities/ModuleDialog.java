@@ -23,16 +23,20 @@ import android.widget.TimePicker;
 import android.widget.Toast;
 
 import com.example.caique.sup.R;
+import com.example.caique.sup.Tools.Constants;
+import com.example.caique.sup.Tools.HandleConnection;
+import com.example.caique.sup.Tools.Methods;
+import com.example.caique.sup.Tools.Preferences;
+import com.example.caique.sup.Tools.Request;
 
+import org.apache.http.NameValuePair;
+import org.apache.http.message.BasicNameValuePair;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.util.ArrayList;
 import java.util.Calendar;
-
-import Tools.Constants;
-import Tools.HandleConnection;
-import Tools.Methods;
-import Tools.Request;
+import java.util.List;
 
 public class ModuleDialog extends ActionBarActivity implements HandleConnection{
     Switch mSwitch;
@@ -56,6 +60,7 @@ public class ModuleDialog extends ActionBarActivity implements HandleConnection{
     EditText mPackFreqET;
     NumberPicker mPackFreqNP;
     AsyncTask<String, Void, Request> mModuleRequest;
+    int mUser;
 
     static final String STATUS = "status";
     static final String PACK_FREQUENCY = "pack_frequency";
@@ -82,6 +87,7 @@ public class ModuleDialog extends ActionBarActivity implements HandleConnection{
         mPackFreqLayout = findViewById(R.id.mod_pack_freq_layout);
         mSleepTimeLayout = findViewById(R.id.mod_sleep_time_layout);
         mSleepFreqLayout = findViewById(R.id.mod_sleep_freq_layout);
+        mUser = Preferences.getUserId(this);
 
         mBattery.setText("" + getIntent().getExtras().getFloat("battery"));
         mSleepFreqValue = getIntent().getExtras().getInt("sleepFrequency");
@@ -115,14 +121,16 @@ public class ModuleDialog extends ActionBarActivity implements HandleConnection{
                                 -1,
                                 null,
                                 -1,
-                                STATUS);
+                                STATUS,
+                                    mUser);
                         else
                             moduleRequest(getIntent().getExtras().getInt("id"),
                                     1,
                                     -1,
                                     null,
                                     -1,
-                                    STATUS);
+                                    STATUS,
+                                    mUser);
                     else {
                         Toast.makeText(getApplicationContext(), Constants.INTERNET_ERROR, Toast.LENGTH_SHORT).show();
                         if (mSwitch.isChecked()) mSwitch.setChecked(false);
@@ -142,14 +150,16 @@ public class ModuleDialog extends ActionBarActivity implements HandleConnection{
                                     -1,
                                     null,
                                     -1,
-                                    STATUS);
+                                    STATUS,
+                                    mUser);
                         else
                             moduleRequest(getIntent().getExtras().getInt("id"),
                                     1,
                                     -1,
                                     null,
                                     -1,
-                                    STATUS);
+                                    STATUS,
+                                    mUser);
                     }
                     else {
                         Toast.makeText(getApplicationContext(), Constants.INTERNET_ERROR, Toast.LENGTH_SHORT).show();
@@ -178,7 +188,8 @@ public class ModuleDialog extends ActionBarActivity implements HandleConnection{
                                     mPackFreqNP.getValue(),
                                     null,
                                     -1,
-                                    PACK_FREQUENCY);
+                                    PACK_FREQUENCY,
+                                    mUser);
                         } else {
                             if (mPackFreqET != null) {
                                 Log.e(getLocalClassName(), "Pack Freq em ET:" + mPackFreqET.getText().toString());
@@ -187,7 +198,8 @@ public class ModuleDialog extends ActionBarActivity implements HandleConnection{
                                         Integer.parseInt(mPackFreqET.getText().toString()),
                                         null,
                                         -1,
-                                        PACK_FREQUENCY);
+                                        PACK_FREQUENCY,
+                                        mUser);
                             }
                         }
                     }
@@ -237,7 +249,8 @@ public class ModuleDialog extends ActionBarActivity implements HandleConnection{
                                 -1,
                                 hourOfDay + ":" + minute + ":00",
                                 -1,
-                                SLEEP_TIME);
+                                SLEEP_TIME,
+                                mUser);
                     }
 
                 },hour, minute, true);
@@ -268,7 +281,8 @@ public class ModuleDialog extends ActionBarActivity implements HandleConnection{
                                     -1,
                                     null,
                                     mSleepFreqNP.getValue(),
-                                    SLEEP_FREQUENCY);
+                                    SLEEP_FREQUENCY,
+                                    mUser);
                         } else {
                             if (mSleepFreqET != null) {
                                 Log.e(getLocalClassName(), "Sleep Freq ET:" + mSleepFreqET.getText().toString());
@@ -277,7 +291,8 @@ public class ModuleDialog extends ActionBarActivity implements HandleConnection{
                                         -1,
                                         null,
                                         Integer.parseInt(mSleepFreqET.getText().toString()),
-                                        SLEEP_FREQUENCY);
+                                        SLEEP_FREQUENCY,
+                                        mUser);
                             }
                         }
                     }
@@ -314,11 +329,11 @@ public class ModuleDialog extends ActionBarActivity implements HandleConnection{
     }
 
     private void moduleRequest(int module, int status, int packFrequency, String sleepTime,
-                               int sleepFrequency, String type) {
+                               int sleepFrequency, String type, int user) {
 
         mModuleRequest = new AsyncTask<String, Void, Request>() {
-            JSONObject rawJson = new JSONObject();
             Request request = new Request();
+            List<NameValuePair> nameValuePairs = new ArrayList<>();
 
             @Override
             protected void onPreExecute() {
@@ -328,38 +343,33 @@ public class ModuleDialog extends ActionBarActivity implements HandleConnection{
             }
 
             @Override
-            protected Request doInBackground(String... params) {
+            protected Request doInBackground(String... strings) {
                 String type = null;
-                Log.e(getLocalClassName(),"TYPE REQUEST: " + params[0]);
-               try{
-                    rawJson.put("module",params[0]);
+                Log.e(getLocalClassName(),"TYPE REQUEST: " + strings[0]);
+                if(!strings[0].isEmpty()) { nameValuePairs.add(new BasicNameValuePair("module", strings[0])); }
+                if(!strings[6].isEmpty()) { nameValuePairs.add(new BasicNameValuePair("user", strings[6])); }
 
-                    switch (params[5]) {
-                        case STATUS:
-                            rawJson.put("status", params[1]);
-                            type = "status";
-                            break;
-                        case PACK_FREQUENCY:
-                            rawJson.put("packFrequency", params[2]);
-                            type = "pack-frequency";
-                            break;
-                        case SLEEP_TIME:
-                            rawJson.put("sleepTime", params[3]);
-                            type = "sleep-time";
-                            break;
-                        case SLEEP_FREQUENCY:
-                            rawJson.put("sleepFrequency", params[4]);
-                            type = "sleep-frequency";
-                            break;
-                    }
-                   request.setResponse(Methods.POST(getApplicationContext(), rawJson, "module/" + type));
-                   request.setType(params[5]);
-                   return request;
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                    Toast.makeText(getApplicationContext(), Constants.TRY_LATER, Toast.LENGTH_SHORT).show();
-                }
-                return null;
+                switch (strings[5]) {
+                     case STATUS:
+                         if(!strings[1].isEmpty()) { nameValuePairs.add(new BasicNameValuePair("status", strings[1])); }
+                         type = "status";
+                         break;
+                     case PACK_FREQUENCY:
+                         if(!strings[2].isEmpty()) { nameValuePairs.add(new BasicNameValuePair("packFrequency", strings[2])); }
+                         type = "pack-frequency";
+                         break;
+                     case SLEEP_TIME:
+                         if(!strings[3].isEmpty()) { nameValuePairs.add(new BasicNameValuePair("sleepTime", strings[3])); }
+                         type = "sleep-time";
+                         break;
+                     case SLEEP_FREQUENCY:
+                         if(!strings[4].isEmpty()) { nameValuePairs.add(new BasicNameValuePair("sleepFrequency", strings[4])); }
+                         type = "sleep-frequency";
+                         break;
+                 }
+                request.setResponse(Methods.Post2(getApplicationContext(), nameValuePairs, "module/" + type));
+                request.setType(strings[5]);
+                return request;
             }
 
             @Override
@@ -382,7 +392,8 @@ public class ModuleDialog extends ActionBarActivity implements HandleConnection{
                 String.valueOf(packFrequency),
                 sleepTime,
                 String.valueOf(sleepFrequency),
-                type);
+                type,
+                String.valueOf(user));
     }
 
     @TargetApi(Build.VERSION_CODES.ICE_CREAM_SANDWICH)

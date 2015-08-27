@@ -3,28 +3,32 @@ package com.example.caique.sup.Activities;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.support.v7.app.ActionBarActivity;
+import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ProgressBar;
 import android.widget.Toast;
 
+import com.example.caique.sup.Objects.User;
 import com.example.caique.sup.R;
+import com.example.caique.sup.Tools.Constants;
+import com.example.caique.sup.Tools.HandleConnection;
+import com.example.caique.sup.Tools.Preferences;
+import com.example.caique.sup.Tools.Request;
 
+import org.apache.http.NameValuePair;
+import org.apache.http.message.BasicNameValuePair;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import Objects.User;
-import Tools.Constants;
-import Tools.HandleConnection;
-import Tools.Preferences;
-import Tools.Request;
+import java.util.ArrayList;
+import java.util.List;
 
-import static Tools.Methods.POST;
-import static Tools.Methods.isNetworkAvailable;
+import static com.example.caique.sup.Tools.Methods.Post2;
+import static com.example.caique.sup.Tools.Methods.isNetworkAvailable;
 
-public class LoginActivity extends ActionBarActivity implements View.OnClickListener, HandleConnection {
+public class LoginActivity extends AppCompatActivity implements View.OnClickListener, HandleConnection {
     EditText mEmailET;
     EditText mPasswordET;
     Button mLoginBT;
@@ -64,7 +68,7 @@ public class LoginActivity extends ActionBarActivity implements View.OnClickList
     }
 
     private void goToHome() {
-        Intent activity = new Intent(this, HomeActivity.class);
+        Intent activity = new Intent(this, CoordinatorActivity.class);
         startActivity(activity);
         finish();
     }
@@ -89,6 +93,7 @@ public class LoginActivity extends ActionBarActivity implements View.OnClickList
         mAsyncTask = new AsyncTask<String, Void, Request>(){
             private JSONObject rawJson = new JSONObject();
             private Request checkRequest = new Request();
+            private List<NameValuePair> nameValuePairs = new ArrayList<NameValuePair>();
 
             @Override
             protected void onPreExecute() {
@@ -101,17 +106,12 @@ public class LoginActivity extends ActionBarActivity implements View.OnClickList
 
             @Override
             protected Request doInBackground(String... strings) {
-                try {
-                    if(!strings[0].isEmpty()) { rawJson.put("email",strings[0]); }
-                    if(!strings[1].isEmpty()) { rawJson.put("password",strings[1]); }
-                    if(!strings[2].isEmpty()) { rawJson.put("type",strings[2]); }
-                    checkRequest.setType(strings[2]);
-                    checkRequest.setResponse(POST(getApplicationContext(),rawJson,"user/login"));
-                    return checkRequest;
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
-                return null;
+                if(!strings[1].isEmpty()) { nameValuePairs.add(new BasicNameValuePair("password", strings[1])); }
+                if(!strings[2].isEmpty()) { nameValuePairs.add(new BasicNameValuePair("type", strings[2])); }
+                if(!strings[0].isEmpty()) { nameValuePairs.add(new BasicNameValuePair("email", strings[0])); }
+                checkRequest.setType(strings[2]);
+                checkRequest.setResponse(Post2(getApplicationContext(), nameValuePairs, "user/login"));
+                return checkRequest;
             }
 
             @Override

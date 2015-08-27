@@ -16,24 +16,32 @@ class UserController extends \BaseController {
       $this->idUser = Crypt::decrypt($id);
     }
   }
+  
+  public function anySendGcm(){
+    $gcm = new GCMController;
+    $user = User::find(Input::get("user"));
+    $registration_ids[] = $user->gcm;
+    $gcm->sendNote($registration_ids,["message"=>"GCM id was saved"]);
+    return $user->gcm;
+  }
 
     public function getIndex()
     {
           return Response::make('You can go and try /login or /register or /edit or /buddies');
     }
+  
+   public function anyLogin(){
+        $user = User::whereEmail(Input::get("email"))->first();
 
-    public function anyLogin(){
-        $json = json_decode(Input::get("json"));
-        $user = User::whereEmail($json->email)->first();
-
-        if( $user && Hash::check( $json->password, $user->password ) ) {
-            $result = ["status"=>"success", "wasRegistered"=>"true", "user"=>$user];
-            //$this->history->save( $user->id, "you lodded in on the system" );
+        if( $user && Hash::check( Input::get("password"), $user->password ) ) {
+          Session::put("user", Crypt::encrypt($user->id));
+          $result = ["status"=>"success", "wasRegistered"=>"true", "user"=>$user];
+          $this->history->save( $user->id, "logou no sistema" );
         } else {
-            $result = ["status"=>"success", "wasRegistered"=>"false"];
+          $result = ["status"=>"success", "wasRegistered"=>"false"];
         }
         
-        return Response::json($result);
+        return $result;
     }
   
     public function anyWebLogin(){
@@ -42,7 +50,8 @@ class UserController extends \BaseController {
         if ( Hash::check( Input::get("password"), $user->password ) ) {
           Session::put("user", Crypt::encrypt($user->id));
           $coordinators = Coordinator::all();
-          return Redirect::to("/")->with('coordenadores',["coordinators"=>$coordinators]);
+          $this->history->save( $user->id, "logou no sistema" );
+          return Redirect::to("/")->with('cordenadores',["coordinators"=>$coordinators]);
         } else {
           return Redirect::to("/")->with('msg','Password does not match!');
         }
@@ -51,51 +60,75 @@ class UserController extends \BaseController {
       }
     }
     
-    public function anyRegister() {
-        $json = json_decode(Input::get("json"));
-        $user = User::whereEmail($json->email)->first();
+  public function anyRegister() {
+    $user = User::whereEmail(Input::get("email"))->first();
+
+    if( $user ) {
+        $result = ["status"=>"success", "wasRegistered"=>"true"];
+    } else {
+        $user = new User;
+        $user->name = Input::get("name");
+        $user->email = Input::get("email");
+        $user->gcm = Input::get("gcm");
+        $user->password = Hash::make(Input::get("password"));
+        $user->save();
+        $result = ["status"=>"success", "wasRegistered"=>"false", "user"=>$user];
+        $this->history->save( $user->id, "registrou no sistema" );
+    }
+
+    return Response::json($result);
+  }
+  
+    public function anySaveGcm(){
+        $user = User::find(Input::get("user"));
         
         if( $user ) {
-            $result = ["status"=>"success", "wasRegistered"=>"true"];
+          $user->gcm = Input::get("gcm");
+          $user->save();
+          $gcm = new GCMController;
+          $registration_ids[] = $user->gcm;
+          $gcm->sendNote($registration_ids,["message"=>"GCM ID foi salvo no servidor"]);
+          $result = ["status"=>"success", "gcm"=>$user->gcm];
         } else {
-            $user = new User;
-            $user->name = $json->name;
-            $user->email = $json->email;
-            $user->password = Hash::make($json->password);
-            $user->save();
-            $result = ["status"=>"success", "wasRegistered"=>"false", "user"=>$user];
-            //$this->history->save( $user->id, "you signed up to the system" );
+          $result = ["status"=>"failed"];
         }
 
         return Response::json($result);
     }
     
     public function anyEdit() {
-        $json = json_decode(Input::get("json"));
-        $user = User::whereEmail($json->email)->first();
+        $user = User::find(Input::get("user"));
 
-        if( Hash::check( $json->password, $user->password ) ) {
-            $user->email = $json->email;
-            $user->password = Hash::make($json->password);
-            $user->name = $json->name;
-            $user->birthdate = $json->birthdate;
+        if($user) {
+          if( Hash::check( Input::get("currentPassword"), $user->password ) ) {
+            $user->email = Input::get("email");
+            $user->password = Hash::make(Input::get("newPassword"));
+            $user->name = Input::get("name");
             $user->save();
-            $result = ["status"=>"success", "registered"=>"true"];
-            $this->history->save( $user->id, "you edited your profile" );
+            $result = ["status"=>"success", "checkPassword"=>true, "user"=>$user];
+            $this->history->save( $user->id, "editou seu perfil" );
+          } else {
+            $result = ["status"=>"success", "checkPassword"=>false];
+          }
         } else {
-            $result = ["status"=>"success", "registered"=>"false"];
+          $result = ["status"=>"fail"];
         }
         
         return Response::json($result);
     }
-    
-    public function anyBuddies() {
-        $json = json_decode(Input::get("json"));
-        $user = User::whereEmail($json->email)->first();
-        $buddies = Buddy::whereUser($user->id)->whereStatus('F')->get();
-        $result = ["status"=>"success", "buddies"=>$buddies];
+  
+    public function anyLoad() {
+        $user = User::find(Input::get("user"));
 
+        if($user) {
+          $result = ["status"=>"success", "user"=>$user];
+        } else {
+          $result = ["status"=>"fail"];
+        }
+        
         return Response::json($result);
     }
-
+  
+  
+    
 }
