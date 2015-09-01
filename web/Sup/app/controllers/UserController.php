@@ -53,13 +53,32 @@ class UserController extends \BaseController {
           $this->history->save( $user->id, "logou no sistema" );
           return Redirect::to("/")->with('cordenadores',["coordinators"=>$coordinators]);
         } else {
-          return Redirect::to("/")->with('msg','Password does not match!');
+          return Redirect::to("/")->with('msg','Senha incorreta!');
         }
       } else {
-        return Redirect::to("/")->with('msg','User not registered!');
+        return Redirect::to("/")->with('msg','Usuário não encontrado. Por favor, realize o registro!');
       }
     }
     
+  public function anyWebRegister() {
+    $user = User::whereEmail(Input::get("email"))->first();
+
+    if( $user ) {
+      return Redirect::to("/")->with('msg','Usuário já registrado. Por favor, realize o login!');
+    } else {
+        $user = new User;
+        $user->name = Input::get("name");
+        $user->email = Input::get("email");
+        $user->gcm = Input::get("gcm");
+        $user->password = Hash::make(Input::get("password"));
+        $user->save();
+        $this->history->save( $user->id, "registrou no sistema" );
+      return Redirect::to("/")->with('msg','Usuário registrado com sucesso!');
+    }
+
+    return Response::json($result);
+  }
+  
   public function anyRegister() {
     $user = User::whereEmail(Input::get("email"))->first();
 

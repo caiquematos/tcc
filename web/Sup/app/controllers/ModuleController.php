@@ -3,17 +3,20 @@
 class ModuleController extends \BaseController {
   
   const BATTERY_FULL = 5.0;
+  const NOTIFICATION_INDEX = 9999;
   private $history;
+  private $coordinator;
   
   public function ModuleController(){
     $this->history = new HistoryController;
   }
 
 	public function getIndex(){
+    $this->coordinator = Input::get("coordinator");
     $modules = Module::whereCoordinator(Input::get("coordinator"))->get();
     foreach ($modules as $module) {
       $module->numb_of_samples = Sample::whereModule($module->id)->count();
-        $module->battery = ($module->battery * 100)/self::BATTERY_FULL;
+      $module->battery = ($module->battery * 100)/self::BATTERY_FULL;
     }
     return View::make('modulos',['modules'=>$modules]);
 	}
@@ -22,6 +25,7 @@ class ModuleController extends \BaseController {
     $modules = Module::whereCoordinator(Input::get("coordinator"))->get();
     foreach ($modules as $module) {
       $module->numb_of_samples = Sample::whereModule($module->id)->count();
+      $module->battery = ($module->battery * 100)/self::BATTERY_FULL;
     }
     return Response::json(["modules"=>$modules]);
   }
@@ -30,6 +34,11 @@ class ModuleController extends \BaseController {
   public function anySample(){
     $samples = Sample::whereModule(Input::get("module"))->orderBy("created_at", "DESC")->take(30)->get();
     return Response::json(["samples"=>$samples]);
+  } 
+  
+  public function anyWebSample(){
+    $samples = Sample::whereModule(Input::get("module"))->orderBy("created_at", "DESC")->take(30)->get();
+    return View::make('modulos.modal',["samples"=>$samples, "module"=>Input::get("module")]);
   }
   
   public function anyPackFrequency(){
@@ -87,15 +96,31 @@ class ModuleController extends \BaseController {
        $gcm = new GCMController;
       if(Input::get("status") == 1) $status = "ATIVADO";
       else $status = "DESATIVADO";
-      $gcm->broadcast("O nó módulo ".$module->id." foi ".$status."!");
       $user = empty(Input::get("user")) ? Session::get("user") : Input::get("user");
       $this->history->save($user, $status." o módulo ".$module->id);
+      $gcm->broadcast("(coord. ".$module->coordinator.") O nó módulo ".$module->id." foi ".$status."!", $module->id + self::NOTIFICATION_INDEX);
       $result = "success";
     } else {
       $result = "fail";
     }
     
     return Response::json(["result" => $result, "status"=>$module->status]);
+  }
+  
+  public function anyEdit(){
+    $module = Module::find(Input::get("module"));
+    
+    if ( $module ) {
+      $module->packFrequency = Input::get("packFrequency");
+      $module->sleepTime = Input::get("sleepTime");
+      $module->sleepFrequency = Input::get("sleepFrequency");
+      $module->save();
+      $result= "Módulo alterado com sucesso!";
+    } else {
+      $result = "Tente mais tarde!";
+    }
+    
+    return Redirect::action('ModuleController@getIndex', ["coordinator"=>$module->coordinator, "result"=>$result]);
   }
   
   
@@ -110,7 +135,7 @@ class ModuleController extends \BaseController {
        if ($module->battery == 1 || $module->battery == 2 || $module->battery == 0.5) {
         $porcentage = ($module->battery * 100)/self::BATTERY_FULL;
         $gcm = new GCMController;
-        $gcm->broadcast("Bateria módulo ".$module->id." abaixo de ".$porcentage."%");
+        $gcm->broadcast("(coord. ".$module->coordinator.") Bateria módulo ".$module->id." abaixo de ".$porcentage."%", $module->id + self::NOTIFICATON_INDEX);
       }// TODO: send push notification
       $result = "success";
     } else {

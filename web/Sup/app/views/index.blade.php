@@ -18,16 +18,17 @@
 </head>
 <body>
   <nav class=" #b2dfdb teal lighten-4" role="navigation">
-    <div class="nav-wrapper container"><a id="logo-container" href="#" class="brand-logo">Supervisório Xbee</a>
+    <div class="nav-wrapper container"><a id="logo-container" href="{{URL::to('/')}}" class="brand-logo">Supervisório Xbee</a>
+      @if(Session::has('user'))
       <ul class="right hide-on-med-and-down">
-        @if(Session::has('user'))
-        <li class="menu"><a href={{URL::to('coordinator/web-list')}}>Coordenadores</a></li>
-        <li class="menu"><a href={{URL::to('logout')}}>Sair</a></li>
-        @endif
+        <li class="menu"><a href={{URL::to('/coordinator')}}>Coordenadores</a></li>
+        <li class="menu"><a href={{URL::to('/logout')}}>Sair</a></li>
       </ul> 
       <ul id="nav-mobile" class=" side-nav">
-        <li><a href="#"></a></li>
+        <li class="menu"><a href={{URL::to('/coordinator')}}>Coordenadores</a></li>
+        <li class="menu"><a href={{URL::to('/logout')}}>Sair</a></li>
       </ul>
+      @endif
       <a href="#" data-activates="nav-mobile" class="button-collapse"><i class="zmdi zmdi-menu"></i></a>
     </div>
   </nav>
@@ -41,8 +42,8 @@
     <div class="container">
       <div class="row">
         <div class="col l6 s12">
-          <h5 class="white-text">Company Bio</h5>
-          <p class="grey-text text-lighten-4">Supervisório de Rede Sem Fio baseada em módulos Xbees.</p>
+          <h5 class="white-text">UNIVASF</h5>
+          <p class="grey-text text-lighten-4">Supervisório de Rede de Sensores sem Fio (Xbee).</p>
 
         </div>
       </div>
@@ -57,7 +58,7 @@
 <script>
  $(document).ready(function(){
     // the "href" attribute of .modal-trigger must specify the modal ID that wants to be triggered
-    $('.modal-trigger').leanModal();
+      $('.modal-trigger').leanModal();
      $(".menu a").click(function(e){
                         e.preventDefault();
                         var href = $( this ).attr('href');

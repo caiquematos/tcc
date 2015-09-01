@@ -3,7 +3,7 @@
   <div class="col s12 m3">
       <div class="card hoverable">
         <div class="card-image">
-          <a href="#modalAmostras1" class="modal-trigger"><img src="img/xbee.png" height="200" width="100"></a>
+          <a href="#modalAmostra" class="modal-trigger" module='{{$module->id}}'><img src="img/web_hi_res_512.png" height="200" width="100"></a>
           <span class="card-title"></span>
         </div>
         <div class="card-content center">
@@ -23,36 +23,27 @@
         </div>
             <div class="card-reveal">
     <span class="card-title grey-text text-darken-4">Detalhes<i class="zmdi zmdi-close right"></i></span><br/>
-      Coordenador<br/> {{$module->coordinator}}             
-    <hr>
-    Frequência de pacotes<input type="number" value="{{$module->packFrequency}}">              
+      Coordenador<br/> {{$module->coordinator}}
+    <form action="/module/edit">
+      <input hidden name="module" value="{{$module->id}}">
+    <hr>  
+    Frequência de pacotes<input type="number" name="packFrequency" value="{{$module->packFrequency}}">              
 
-    Sleep Time<input type="time" value="{{$module->sleepTime}}">           
+    Sleep Time<input type="time" name="sleepTime" value="{{$module->sleepTime}}">           
 
-    Sleep Frequency<input type="number" value="{{$module->sleepFrequency}}">             
+    Sleep Frequency<input type="number" name="sleepFrequency" value="{{$module->sleepFrequency}}">             
 
-    Número de Amostras<br/><input type="number" value="{{$module->numb_of_samples}}">
+    Número de Amostras<br/> {{$module->numb_of_samples}}
 
-    <div class="center" ><a class="btn waves-effect waves-light green">Alterar</a></div>
-
+    <div class="center" ><button class="btn waves-effect waves-light green" type="submit" name="action">Alterar</a></div>
+    </form>
     </div>
       </div>
   </div>  
   @endforeach
-</div>
-
-<!-- Modal Structure -->
-<div id="modalAmostras1" class="modal">
-    <h5 class="center">Módulo 01</h5>
-  <div class="modal-content">
-    <ul class="collection">
-    <li class="collection-item">0) <b style="font-size:20px">33.33</b> em 2015-08-11 21:25:98.0</li>
-    <li class="collection-item">1) <b style="font-size:20px">33.33</b>  em 2015-08-11 21:25:98.0</li>
-    <li class="collection-item">2) <b style="font-size:20px">33.33</b>  em 2015-08-11 21:25:98.0</li>
-    <li class="collection-item">3) <b style="font-size:20px">33.33</b>  em 2015-08-11 21:25:98.0</li>
-      </ul>
-  </div>
-
+  
+  <!-- Modal Structure -->
+<div id="modalAmostra" class="modal">
 </div>
 
 <script>
@@ -68,6 +59,17 @@
         .fail(function(){
           alert("falhou");
         });          
+    });
+   
+
+    $(".modal-trigger").click(function(e){
+      var module = $(this).attr('module');
+      $("#modalAmostra").load("/module/web-sample",
+                              {"module":module},
+                              function(){
+                                            $(".modal-trigger").leanModal();
+
+      });
     });
    
   });

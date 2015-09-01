@@ -37,14 +37,14 @@ class GCMController extends \BaseController {
     curl_close($ch);
   }
   
-  public function broadcast($message)
+  public function broadcast($message, $id)
   {
     //$message = Input::get("message");
     $users = User::groupBy("gcm")->get();
     foreach ($users as $user) {
       $registatoin_ids[] = $user->gcm;
     }
-    $message = ["message" => $message];
+    $message = ["message" => $message,"id"=>$id];
     $this->sendNote($registatoin_ids, $message);
   
     //return $users;

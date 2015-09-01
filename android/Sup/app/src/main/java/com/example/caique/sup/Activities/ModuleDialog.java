@@ -89,7 +89,7 @@ public class ModuleDialog extends ActionBarActivity implements HandleConnection{
         mSleepFreqLayout = findViewById(R.id.mod_sleep_freq_layout);
         mUser = Preferences.getUserId(this);
 
-        mBattery.setText("" + getIntent().getExtras().getFloat("battery"));
+        mBattery.setText("" + getIntent().getExtras().getFloat("battery") + "%");
         mSleepFreqValue = getIntent().getExtras().getInt("sleepFrequency");
         mSleepFreq.setText("" + mSleepFreqValue);
         mSleepTime.setText("" + getIntent().getExtras().getString("sleepTime"));

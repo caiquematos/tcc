@@ -4,7 +4,7 @@ import android.annotation.TargetApi;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
-import android.support.v7.app.ActionBarActivity;
+import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
 import android.view.Window;
@@ -29,7 +29,7 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 import java.util.List;
 
-public class CoordinatorDialog extends ActionBarActivity implements HandleConnection {
+public class CoordinatorDialog extends AppCompatActivity implements HandleConnection {
     TextView mBattery;
     TextView mNumbOfMod;
     Switch mSwitch;
@@ -54,7 +54,7 @@ public class CoordinatorDialog extends ActionBarActivity implements HandleConnec
         mUser = Preferences.getUserId(this);
 
         mCoordinatorTitle.setText("Cordenador " + getIntent().getExtras().getInt("id"));
-        mBattery.setText("" + getIntent().getExtras().getFloat("battery"));
+        mBattery.setText("" + getIntent().getExtras().getFloat("battery") + "%");
         mNumbOfMod.setText("" + getIntent().getExtras().getInt("numb_of_modules"));
         mStatus = getIntent().getExtras().getChar("status");
         Log.e(getLocalClassName(),"Status: " + mStatus);

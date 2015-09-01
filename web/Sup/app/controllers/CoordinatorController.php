@@ -23,13 +23,9 @@ class CoordinatorController extends \BaseController {
     $coordinators = Coordinator::all();
     foreach ($coordinators as $coordinator) {
       $coordinator->numb_of_modules = Module::whereCoordinator($coordinator->id)->count();
+      $coordinator->battery = ($coordinator->battery * 100)/self::BATTERY_FULL;
     }
     return Response::json(["coordinators"=>$coordinators]);
-  }
-  
-  public function anyWebList(){
-    $coordinators = Coordinator::all();
-    return View::make('coordenadores', ['coordinators'=>$coordinators]);
   }
     
   //Set the device status, used by the apps and either the DEVICE
@@ -42,9 +38,9 @@ class CoordinatorController extends \BaseController {
       $gcm = new GCMController;
       if(Input::get("status") == 1) $status = "ATIVADO";
       else $status = "DESATIVADO";
-      $gcm->broadcast("O nó coordenador ".$coordinator->id." foi ".$status."!");
       $user = empty(Input::get("user")) ? Session::get("user") : Input::get("user");
       $this->history->save($user, $status." o nó coordenador ".$coordinator->id);
+      $gcm->broadcast("O nó coordenador ".$coordinator->id." foi ".$status."!", $coordinator->id);
       $result = "success";
     } else {
       $result = "fail";
@@ -99,7 +95,7 @@ class CoordinatorController extends \BaseController {
       if ($coordinator->battery == 1 || $coordinator->battery == 2 || $coordinator->battery == 0.5) {
         $porcentage = ($coordinator->battery * 100)/self::BATTERY_FULL;
         $gcm = new GCMController;
-        $gcm->broadcast("Bateria coordenador ".$coordinator->id." abaixo de ".$porcentage."%");
+        $gcm->broadcast("Bateria coordenador ".$coordinator->id." abaixo de ".$porcentage."%", $coordinator->id);
       }// TODO: send push notification
       $result = "success";
     } else {

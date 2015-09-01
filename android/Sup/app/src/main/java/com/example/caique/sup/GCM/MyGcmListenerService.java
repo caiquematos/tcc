@@ -8,6 +8,7 @@ import android.media.RingtoneManager;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v7.app.NotificationCompat;
+import android.util.Log;
 
 import com.example.caique.sup.Activities.MainActivity;
 import com.example.caique.sup.R;
@@ -23,11 +24,14 @@ public class MyGcmListenerService extends GcmListenerService {
         //super.onMessageReceived(from, data);
 
         String message = data.getString("message");
+        int id = Integer.parseInt(data.getString("id"));
 
-        sendNotification(message);
+        Log.e(getClass().getName(), "on notific: " + id);
+
+        sendNotification(message, id);
     }
 
-    private void sendNotification(String message) {
+    private void sendNotification(String message, int id) {
         Intent intent = new Intent(this, MainActivity.class);
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
         PendingIntent pendingIntent = PendingIntent.getActivity(this, 0 /* Request code */, intent,
@@ -36,7 +40,7 @@ public class MyGcmListenerService extends GcmListenerService {
         Uri defaultSoundUri= RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
         NotificationCompat.Builder notificationBuilder = (NotificationCompat.Builder) new NotificationCompat.Builder(this)
                 .setSmallIcon(R.drawable.ic_stat_xbee_icon)
-                .setContentTitle("GCM Message")
+                .setContentTitle("Supervisório XBee")
                 .setContentText(message)
                 .setAutoCancel(true)
                 .setSound(defaultSoundUri)
@@ -45,7 +49,7 @@ public class MyGcmListenerService extends GcmListenerService {
         NotificationManager notificationManager =
                 (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
 
-        notificationManager.notify(0 /* ID of notification */, notificationBuilder.build());
+        notificationManager.notify(id /* ID of notification */, notificationBuilder.build());
 
     }
 

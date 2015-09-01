@@ -256,7 +256,7 @@ public class CustomAdapter extends RecyclerView.Adapter<CustomAdapter.ViewHolder
         // with that element
         viewHolder.getTitle().setText("Coordenador " + local_coordinators.getId());
         viewHolder.getBody().setText("número de módulos: " + local_coordinators.getNumOfModules()
-                + "  battery: " + local_coordinators.getBattery());
+                + "  battery: " + local_coordinators.getBattery() + "%");
         if (local_coordinators.getStatus() == '1') {
             if (viewHolder.getSwitch() != null) viewHolder.getSwitch().setChecked(true);
             if (viewHolder.getCheckbox() != null) viewHolder.getCheckbox().setChecked(true);

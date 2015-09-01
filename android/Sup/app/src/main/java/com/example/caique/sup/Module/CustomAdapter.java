@@ -251,7 +251,7 @@ public class CustomAdapter extends RecyclerView.Adapter<CustomAdapter.ViewHolder
         // with that element
         viewHolder.getTitle().setText("Módulo " + local_modules.getId());
         viewHolder.getBody().setText("número de amostras: " + local_modules.getNumOfSamples()
-                + "  battery: " + local_modules.getBattery());
+                + "  battery: " + local_modules.getBattery() + "%");
         Log.d(TAG, "status view " + position + " set: " +local_modules.getStatus());
         if (local_modules.getStatus() == '1') {
             if (viewHolder.getSwitch() != null) viewHolder.getSwitch().setChecked(true);

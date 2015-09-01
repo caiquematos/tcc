@@ -3,7 +3,7 @@
 @parent
 <div class="wrapper-valign">
     <div class="container row center valign" style="width:350px;">
-    <form action="/user/web-login">
+     <form action="/user/web-login">
       <div class="card-panel hoverable #fafafa grey lighten-5 ">
         <div class="input-field col s12">
             <i class="zmdi zmdi-account prefix"></i>
@@ -34,7 +34,7 @@
     <div class="modal-content">
       <h4 class="caption center-align">Criar Conta</h4>
         <div class="row center">
-        <form action="/user/register">
+        <form action="/user/web-register">
         <div class="input-field col s12">
           <input id="register-name" name="name" type="text" >
           <label for="register-name" data-error="wrong" >Nome</label>
