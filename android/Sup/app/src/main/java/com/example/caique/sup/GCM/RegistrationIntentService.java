@@ -51,14 +51,19 @@ public class RegistrationIntentService extends IntentService implements HandleCo
                     GoogleCloudMessaging.INSTANCE_ID_SCOPE, null);
                 Log.i(TAG, "GCM Registration Token: " + token);
 
-                if (Methods.isNetworkAvailable(getApplicationContext()) && Preferences.getAccountStatus(this))
-                    sendRegistrationToServer(token, String.valueOf(Preferences.getUserId(getApplicationContext())), "GCM");
-                else
-                    Toast.makeText(getApplication(),Constants.INTERNET_ERROR,Toast.LENGTH_SHORT).show();
-
                 subscribeTopics(token);
 
                 sharedPreferences.edit().putString(Constants.GCM_ID, token).apply();
+
+                if (Methods.isNetworkAvailable(getApplicationContext()))
+                    if (Preferences.getAccountStatus(this))
+                        sendRegistrationToServer(token, String.valueOf(Preferences.getUserId(getApplicationContext())), "GCM");
+                    else {
+                        sharedPreferences.edit().putBoolean(Constants.SENT_TOKEN_TO_SERVER, false).apply();
+                        Log.e(getClass().getName(),"Got GCM ID, user not registered yet tho");
+                    }
+                else
+                    Toast.makeText(getApplication(),Constants.INTERNET_ERROR,Toast.LENGTH_SHORT).show();
             }
         } catch (IOException e) {
             Log.d(TAG, "Failed to complete token refresh", e);

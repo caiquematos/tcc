@@ -135,7 +135,7 @@ class ModuleController extends \BaseController {
        if ($module->battery == 1 || $module->battery == 2 || $module->battery == 0.5) {
         $porcentage = ($module->battery * 100)/self::BATTERY_FULL;
         $gcm = new GCMController;
-        $gcm->broadcast("(coord. ".$module->coordinator.") Bateria módulo ".$module->id." abaixo de ".$porcentage."%", $module->id + self::NOTIFICATON_INDEX);
+        $gcm->broadcast("(coord. ".$module->coordinator.") Bateria módulo ".$module->id." abaixo de ".$porcentage."%", $module->id + self::NOTIFICATION_INDEX );
       }// TODO: send push notification
       $result = "success";
     } else {

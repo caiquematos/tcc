@@ -10,7 +10,7 @@ class HistoryController extends \BaseController {
 	 */
 	public function getIndex()
 	{
-		return Response::make('stop sooping around!');
+		return Response::make('stop snooping around!');
 	}
   
   public function anyList(){

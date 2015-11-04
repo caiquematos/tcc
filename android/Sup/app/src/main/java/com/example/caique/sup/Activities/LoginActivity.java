@@ -91,7 +91,6 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
     private void connectionRequest(final String email, final String password, final String type) {
 
         mAsyncTask = new AsyncTask<String, Void, Request>(){
-            private JSONObject rawJson = new JSONObject();
             private Request checkRequest = new Request();
             private List<NameValuePair> nameValuePairs = new ArrayList<NameValuePair>();
 

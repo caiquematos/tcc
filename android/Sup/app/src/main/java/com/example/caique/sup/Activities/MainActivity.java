@@ -19,6 +19,8 @@ import com.example.caique.sup.Tools.Preferences;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesUtil;
 
+import static com.example.caique.sup.Tools.Constants.GCM_ID;
+
 
 public class MainActivity extends AppCompatActivity {
     private static final int PLAY_SERVICES_RESOLUTION_REQUEST = 9000;
@@ -47,7 +49,7 @@ public class MainActivity extends AppCompatActivity {
                     boolean sentToken = sharedPreferences
                             .getBoolean(Constants.SENT_TOKEN_TO_SERVER, false);
 
-                    if (sentToken) {
+                    if (sentToken || !sharedPreferences.getString(GCM_ID,"").isEmpty()) {
                         Log.e(getLocalClassName(), "ON RECEIVE: " + getString(R.string.gcm_send_message));
                         goToLogin();
                     } else {

@@ -9,11 +9,12 @@ public interface Constants {
     //String MAIN_URL="http://sup.com/";
     //String MAIN_URL = "http://192.168.1.112:8000/";
     //String MAIN_URL = "http://192.168.1.105:8000/";
-    String MAIN_URL = "http://10.87.168.46:8000/";
+    String MAIN_URL = "http://192.168.1.132:8000/";
+    //String MAIN_URL = "http://10.87.168.46:8000/";
     String INTERNET_ERROR = "CONECTE-SE A UMA REDE VÁLIDA!!!";
     String TRY_LATER = "POR FAVOR TENTE MAIS TARDE";
 
-    public final static String SENT_TOKEN_TO_SERVER = "sentTokenToServer";
-    public final static String REGISTRATION_COMPLETE = "sentTokenToServer";
-    public final static String GCM_ID = "gcmId";
+     String SENT_TOKEN_TO_SERVER = "sentTokenToServer";
+    String REGISTRATION_COMPLETE = "sentTokenToServer";
+    String GCM_ID = "gcmId";
 }
